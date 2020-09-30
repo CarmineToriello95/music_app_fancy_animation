@@ -1,16 +1,15 @@
-import 'package:flutter/material.dart';
 import 'models/album.dart';
 
-const List<Album> albums = [
+const List<Album> hardCodedAlbums = [
   const Album(
     id: 0,
     author: 'David Bowie',
     title: 'Heroes',
-    coverPath: 'assets/images/david.jpg',
+    coverPath: 'assets/images/david_bowie.jpg',
     images: [
-      'assets/images/david.jpg',
-      'assets/images/david.jpg',
-      'assets/images/david.jpg'
+      'assets/images/david_bowie.jpg',
+      'assets/images/david_bowie.jpg',
+      'assets/images/david_bowie.jpg'
     ],
     genres: ['art rock', 'electronic', 'art pop'],
     trackList: [
@@ -30,11 +29,11 @@ const List<Album> albums = [
     id: 1,
     author: 'David Bowie',
     title: 'Heroes',
-    coverPath: 'assets/images/david.jpg',
+    coverPath: 'assets/images/david_bowie.jpg',
     images: [
-      'assets/images/david.jpg',
-      'assets/images/david.jpg',
-      'assets/images/david.jpg'
+      'assets/images/david_bowie.jpg',
+      'assets/images/david_bowie.jpg',
+      'assets/images/david_bowie.jpg'
     ],
     genres: ['art rock', 'electronic', 'art pop'],
     trackList: [
@@ -54,11 +53,11 @@ const List<Album> albums = [
     id: 2,
     author: 'David Bowie',
     title: 'Heroes',
-    coverPath: 'assets/images/david.jpg',
+    coverPath: 'assets/images/david_bowie.jpg',
     images: [
-      'assets/images/david.jpg',
-      'assets/images/david.jpg',
-      'assets/images/david.jpg'
+      'assets/images/david_bowie.jpg',
+      'assets/images/david_bowie.jpg',
+      'assets/images/david_bowie.jpg'
     ],
     genres: ['art rock', 'electronic', 'art pop'],
     trackList: [
@@ -78,11 +77,11 @@ const List<Album> albums = [
     id: 3,
     author: 'David Bowie',
     title: 'Heroes',
-    coverPath: 'assets/images/david.jpg',
+    coverPath: 'assets/images/david_bowie.jpg',
     images: [
-      'assets/images/david.jpg',
-      'assets/images/david.jpg',
-      'assets/images/david.jpg'
+      'assets/images/david_bowie.jpg',
+      'assets/images/david_bowie.jpg',
+      'assets/images/david_bowie.jpg'
     ],
     genres: ['art rock', 'electronic', 'art pop'],
     trackList: [
@@ -102,11 +101,11 @@ const List<Album> albums = [
     id: 4,
     author: 'David Bowie',
     title: 'Heroes',
-    coverPath: 'assets/images/david.jpg',
+    coverPath: 'assets/images/david_bowie.jpg',
     images: [
-      'assets/images/david.jpg',
-      'assets/images/david.jpg',
-      'assets/images/david.jpg'
+      'assets/images/david_bowie.jpg',
+      'assets/images/david_bowie.jpg',
+      'assets/images/david_bowie.jpg'
     ],
     genres: ['art rock', 'electronic', 'art pop'],
     trackList: [
@@ -126,11 +125,11 @@ const List<Album> albums = [
     id: 5,
     author: 'David Bowie',
     title: 'Heroes',
-    coverPath: 'assets/images/david.jpg',
+    coverPath: 'assets/images/david_bowie.jpg',
     images: [
-      'assets/images/david.jpg',
-      'assets/images/david.jpg',
-      'assets/images/david.jpg'
+      'assets/images/david_bowie.jpg',
+      'assets/images/david_bowie.jpg',
+      'assets/images/david_bowie.jpg'
     ],
     genres: ['art rock', 'electronic', 'art pop'],
     trackList: [
