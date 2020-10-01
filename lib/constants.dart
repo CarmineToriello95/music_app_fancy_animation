@@ -1,5 +1,9 @@
 import 'models/album.dart';
 
+const String heroTagAppBar = 'app_bar';
+const String heroTagImageSection = 'image_section';
+const String heroTagBodySection = 'body_section';
+
 const List<Album> hardCodedAlbums = [
   const Album(
     id: 0,

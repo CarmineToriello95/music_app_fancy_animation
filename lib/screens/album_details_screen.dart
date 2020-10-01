@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../constants.dart';
 import '../models/album.dart';
 import '../shared_widgets.dart/carousel_dots.dart';
 import '../shared_widgets.dart/custom_app_bar.dart';
@@ -54,7 +55,7 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
         child: Column(
           children: <Widget>[
             Hero(
-              tag: 'app_bar',
+              tag: heroTagAppBar,
               flightShuttleBuilder: (
                 BuildContext flightContext,
                 Animation<double> heroAnimation,
@@ -92,7 +93,7 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
                 child: Column(
                   children: <Widget>[
                     Hero(
-                      tag: 'image',
+                      tag: heroTagImageSection,
                       flightShuttleBuilder: (
                         BuildContext flightContext,
                         Animation<double> heroAnimation,
@@ -104,7 +105,7 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
                           animation: heroAnimation,
                           builder: (_, __) {
                             return ImageSectionAnimation(
-                              imagePath: widget.album.coverPath,
+                              imagePath: widget.album.images[_currentIndex],
                               heroAnimationValue: heroAnimation.value,
                               pageController: _pageController,
                             );
@@ -161,7 +162,7 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
                     Expanded(
                       flex: 2,
                       child: Hero(
-                        tag: 'body',
+                        tag: heroTagBodySection,
                         flightShuttleBuilder: (
                           BuildContext flightContext,
                           Animation<double> heroAnimation,

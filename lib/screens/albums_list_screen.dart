@@ -62,7 +62,7 @@ class _AlbumsListScreenState extends State<AlbumsListScreen>
         child: Column(
           children: <Widget>[
             Hero(
-              tag: 'app_bar',
+              tag: heroTagAppBar,
               flightShuttleBuilder: (
                 BuildContext flightContext,
                 Animation<double> heroAnimation,
@@ -257,14 +257,14 @@ class AlbumCard extends StatelessWidget {
         ? Column(
             children: <Widget>[
               Hero(
-                tag: 'image',
+                tag: heroTagImageSection,
                 child: AlbumCardImageSection(
                   album: album,
                 ),
               ),
               Expanded(
                 child: Hero(
-                  tag: 'body',
+                  tag: heroTagBodySection,
                   child: AlbumCardBodySection(album: album),
                 ),
               ),
