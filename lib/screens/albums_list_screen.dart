@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:music_app_fancy_animation/bloc/bloc.dart';
-import 'package:music_app_fancy_animation/screens/album_details_screen.dart';
-import 'package:music_app_fancy_animation/shared_widgets.dart/carousel_dots.dart';
 
+import '../bloc/bloc.dart';
 import '../constants.dart';
 import '../models/album.dart';
+import '../shared_widgets.dart/carousel_dots.dart';
+import '../shared_widgets.dart/custom_app_bar.dart';
+import 'album_details_screen.dart';
 
 class AlbumsListScreen extends StatefulWidget {
   @override
@@ -17,6 +18,8 @@ class _AlbumsListScreenState extends State<AlbumsListScreen>
   AnimationController _swipeAnimationController;
   bool _isSwipeToLeft;
   int _currentIndex;
+  bool _isDraggable;
+  bool _isDragFromLeft;
 
   @override
   void initState() {
@@ -48,99 +51,130 @@ class _AlbumsListScreenState extends State<AlbumsListScreen>
       );
     _isSwipeToLeft = true;
     _currentIndex = 0;
+    _isDragFromLeft = false;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0.0,
-        backgroundColor: Colors.transparent,
-        title: Text('Rock of 1970s'),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {},
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: GestureDetector(
-        onHorizontalDragStart: _onDragStart,
-        onHorizontalDragUpdate: _onDragUpdate,
-        onHorizontalDragEnd: _onDragEnd,
-        onTap: () => Navigator.of(context).push(
-          _createRoute(_bloc.stackAlbumList[0]),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 48.0, bottom: 8.0),
-          child: Column(
-            children: <Widget>[
-              Container(
-                height: MediaQuery.of(context).size.height * 0.7 + 48.0,
-                child: AnimatedBuilder(
-                  animation: _swipeAnimationController,
-                  builder: (_, child) {
-                    return StreamBuilder<List<Album>>(
-                      stream: _bloc.sStackAlbums,
-                      builder: (_, snapshot) {
-                        if (snapshot.hasData) {
-                          return Stack(
-                            children: <Widget>[
-                              Transform.scale(
-                                scale: 0.9,
-                                child: AlbumCard(album: snapshot.data[2]),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 24.0),
-                                child: Transform.scale(
-                                  scale: 0.95,
-                                  child: AlbumCard(album: snapshot.data[1]),
-                                ),
-                              ),
-                              Transform.translate(
-                                offset: _isSwipeToLeft
-                                    ? Offset(
-                                        _swipeAnimationController.value *
-                                            -MediaQuery.of(context).size.width,
-                                        0,
-                                      )
-                                    : Offset(
-                                        (1 - _swipeAnimationController.value) *
-                                            -MediaQuery.of(context).size.width,
-                                        0,
-                                      ),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(bottom: 48.0),
-                                  child: AlbumCard(
-                                    album: snapshot.data[0],
-                                    isFrontCard: true,
-                                  ),
-                                ),
-                              )
-                            ],
-                          );
-                        } else {
-                          return Container();
-                        }
-                      },
+      body: SafeArea(
+        child: Column(
+          children: <Widget>[
+            Hero(
+              tag: 'app_bar',
+              flightShuttleBuilder: (
+                BuildContext flightContext,
+                Animation<double> heroAnimation,
+                HeroFlightDirection flightDirection,
+                BuildContext fromHeroContext,
+                BuildContext toHeroContext,
+              ) {
+                return AnimatedBuilder(
+                  animation: heroAnimation,
+                  builder: (_, __) {
+                    return CustomAppBar(
+                      opacityValue: 1 - heroAnimation.value,
+                      leading: IconButton(
+                        icon: Icon(Icons.arrow_back),
+                        onPressed: () {},
+                      ),
+                      title: 'Rock of 1970s',
                     );
                   },
+                );
+              },
+              child: CustomAppBar(
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {},
+                ),
+                title: 'Rock of 1970s',
+              ),
+            ),
+            GestureDetector(
+              onHorizontalDragStart: _onDragStart,
+              onHorizontalDragUpdate: _onDragUpdate,
+              onHorizontalDragEnd: _onDragEnd,
+              onTap: () => Navigator.of(context).push(
+                _createRoute(_bloc.stackAlbumList[0]),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 48.0, bottom: 8.0),
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.75,
+                      child: AnimatedBuilder(
+                        animation: _swipeAnimationController,
+                        builder: (_, child) {
+                          return StreamBuilder<List<Album>>(
+                            stream: _bloc.sStackAlbums,
+                            builder: (_, snapshot) {
+                              if (snapshot.hasData) {
+                                return Stack(
+                                  children: <Widget>[
+                                    Transform.scale(
+                                      scale: 0.9,
+                                      child: AlbumCard(album: snapshot.data[2]),
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 24.0),
+                                      child: Transform.scale(
+                                        scale: 0.95,
+                                        child:
+                                            AlbumCard(album: snapshot.data[1]),
+                                      ),
+                                    ),
+                                    Transform.translate(
+                                      offset: _isSwipeToLeft
+                                          ? Offset(
+                                              _swipeAnimationController.value *
+                                                  -MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                              0,
+                                            )
+                                          : Offset(
+                                              (1 -
+                                                      _swipeAnimationController
+                                                          .value) *
+                                                  -MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                              0,
+                                            ),
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 48.0),
+                                        child: AlbumCard(
+                                          album: snapshot.data[0],
+                                          isFrontCard: true,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                );
+                              } else {
+                                return Container();
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: CarouselDots(
+                        dotsNumber: hardCodedAlbums.length,
+                        activeIndex: _currentIndex,
+                      ),
+                    )
+                  ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: CarouselDots(
-                  dotsNumber: hardCodedAlbums.length,
-                  activeIndex: _currentIndex,
-                ),
-              )
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -156,8 +190,7 @@ class _AlbumsListScreenState extends State<AlbumsListScreen>
     );
   }
 
-  bool _isDraggable;
-  bool _isDragFromLeft = false;
+  
 
   void _onDragStart(DragStartDetails details) {
     _isDragFromLeft = _swipeAnimationController.isDismissed &&

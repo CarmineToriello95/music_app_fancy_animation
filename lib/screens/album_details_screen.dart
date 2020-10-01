@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../models/album.dart';
 import '../shared_widgets.dart/carousel_dots.dart';
+import '../shared_widgets.dart/custom_app_bar.dart';
 
 class AlbumDetailsScreen extends StatefulWidget {
   final Album album;
@@ -15,7 +16,7 @@ class AlbumDetailsScreen extends StatefulWidget {
 class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
     with TickerProviderStateMixin {
   PageController _pageController;
-  AnimationController _animationController;
+  AnimationController _trackListAnimationController;
   int _currentIndex;
   bool _animatingToTrackListScreen;
 
@@ -25,7 +26,7 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
     _currentIndex = 0;
     _pageController =
         PageController(initialPage: _currentIndex, viewportFraction: 0.85);
-    _animationController = AnimationController(
+    _trackListAnimationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 600),
     );
@@ -35,42 +36,18 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
   @override
   void dispose() {
     _pageController.dispose();
-    _animationController.dispose();
+    _trackListAnimationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0.0,
-        backgroundColor: Colors.transparent,
-        title: Text('${widget.album.author} - ${widget.album.title} '),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: GestureDetector(
-        onTap: () {
-          setState(() {
-            _animatingToTrackListScreen = true;
-          });
-          _animationController.forward();
-        },
+      body: SafeArea(
         child: Column(
           children: <Widget>[
             Hero(
-              tag: 'image',
+              tag: 'app_bar',
               flightShuttleBuilder: (
                 BuildContext flightContext,
                 Animation<double> heroAnimation,
@@ -81,88 +58,136 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
                 return AnimatedBuilder(
                   animation: heroAnimation,
                   builder: (_, __) {
-                    return ImageSectionAnimation(
-                      album: widget.album,
-                      heroAnimationValue: heroAnimation.value,
-                      pageController: _pageController,
+                    return CustomAppBar(
+                      opacityValue: heroAnimation.value,
+                      leading: IconButton(
+                        icon: CustomBackIconAppBar(),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      title: '${widget.album.author} - ${widget.album.title} ',
                     );
                   },
                 );
               },
-              child: !_animatingToTrackListScreen
-                  ? ImagesCarousel(
-                      album: widget.album,
-                      currentIndex: _currentIndex,
-                      onPageChanged: (index) {
-                        setState(
-                          () {
-                            _currentIndex = index;
+              child: CustomAppBar(
+                leading: IconButton(
+                  icon: CustomBackIconAppBar(),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                title: '${widget.album.author} - ${widget.album.title} ',
+              ),
+            ),
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _animatingToTrackListScreen = true;
+                  });
+                  _triggerTrackListAnimation();
+                },
+                child: Column(
+                  children: <Widget>[
+                    Hero(
+                      tag: 'image',
+                      flightShuttleBuilder: (
+                        BuildContext flightContext,
+                        Animation<double> heroAnimation,
+                        HeroFlightDirection flightDirection,
+                        BuildContext fromHeroContext,
+                        BuildContext toHeroContext,
+                      ) {
+                        return AnimatedBuilder(
+                          animation: heroAnimation,
+                          builder: (_, __) {
+                            return ImageSectionAnimation(
+                              album: widget.album,
+                              heroAnimationValue: heroAnimation.value,
+                              pageController: _pageController,
+                            );
                           },
                         );
                       },
-                    )
-                  : AnimatedBuilder(
-                      animation: _animationController,
-                      builder: (_, __) {
-                        return ImageSectionAnimation(
-                          album: widget.album,
-                          showTrackListAnimationValue:
-                              _animationController.value,
-                          pageController: _pageController,
-                        );
-                      },
+                      child: !_animatingToTrackListScreen
+                          ? ImagesCarousel(
+                              album: widget.album,
+                              currentIndex: _currentIndex,
+                              onPageChanged: (index) {
+                                setState(
+                                  () {
+                                    _currentIndex = index;
+                                  },
+                                );
+                              },
+                            )
+                          : AnimatedBuilder(
+                              animation: _trackListAnimationController,
+                              builder: (_, __) {
+                                return ImageSectionAnimation(
+                                  album: widget.album,
+                                  showTrackListAnimationValue:
+                                      _trackListAnimationController.value,
+                                  pageController: _pageController,
+                                );
+                              },
+                            ),
                     ),
-            ),
-            !_animatingToTrackListScreen
-                ? Column(
-                    children: <Widget>[
-                      SizedBox(
-                        height: 12.0,
+                    !_animatingToTrackListScreen
+                        ? Column(
+                            children: <Widget>[
+                              SizedBox(
+                                height: 12.0,
+                              ),
+                              CarouselDots(
+                                dotsNumber: widget.album.images.length,
+                                activeIndex: _currentIndex,
+                              ),
+                              SizedBox(
+                                height: 12.0,
+                              ),
+                            ],
+                          )
+                        : AnimatedBuilder(
+                            animation: _trackListAnimationController,
+                            builder: (_, child) => Container(
+                              height:
+                                  (1 - _trackListAnimationController.value) *
+                                      30,
+                            ),
+                          ),
+                    Expanded(
+                      flex: 2,
+                      child: Hero(
+                        tag: 'body',
+                        flightShuttleBuilder: (
+                          BuildContext flightContext,
+                          Animation<double> heroAnimation,
+                          HeroFlightDirection flightDirection,
+                          BuildContext fromHeroContext,
+                          BuildContext toHeroContext,
+                        ) {
+                          return AnimatedBuilder(
+                            animation: heroAnimation,
+                            builder: (_, __) {
+                              return BodySectionAnimation(
+                                album: widget.album,
+                                heroAnimationValue: heroAnimation.value,
+                              );
+                            },
+                          );
+                        },
+                        child: AnimatedBuilder(
+                          animation: _trackListAnimationController,
+                          builder: (_, __) {
+                            return BodySectionAnimation(
+                              album: widget.album,
+                              showTrackListAnimationValue:
+                                  _trackListAnimationController.value,
+                            );
+                          },
+                        ),
                       ),
-                      CarouselDots(
-                        dotsNumber: widget.album.images.length,
-                        activeIndex: _currentIndex,
-                      ),
-                      SizedBox(
-                        height: 12.0,
-                      ),
-                    ],
-                  )
-                : AnimatedBuilder(
-                    animation: _animationController,
-                    builder: (_, child) => Container(
-                      height: (1 - _animationController.value) * 30,
                     ),
-                  ),
-            Expanded(
-              flex: 2,
-              child: Hero(
-                tag: 'body',
-                flightShuttleBuilder: (
-                  BuildContext flightContext,
-                  Animation<double> heroAnimation,
-                  HeroFlightDirection flightDirection,
-                  BuildContext fromHeroContext,
-                  BuildContext toHeroContext,
-                ) {
-                  return AnimatedBuilder(
-                    animation: heroAnimation,
-                    builder: (_, __) {
-                      return BodySectionAnimation(
-                        album: widget.album,
-                        heroAnimationValue: heroAnimation.value,
-                      );
-                    },
-                  );
-                },
-                child: AnimatedBuilder(
-                  animation: _animationController,
-                  builder: (_, __) {
-                    return BodySectionAnimation(
-                      album: widget.album,
-                      showTrackListAnimationValue: _animationController.value,
-                    );
-                  },
+                  ],
                 ),
               ),
             ),
@@ -170,6 +195,14 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
         ),
       ),
     );
+  }
+
+  _triggerTrackListAnimation() {
+    if (_trackListAnimationController.isDismissed) {
+      _trackListAnimationController.forward();
+    } else if (_trackListAnimationController.isCompleted) {
+      _trackListAnimationController.reverse();
+    }
   }
 }
 
@@ -312,7 +345,7 @@ class BodySectionAnimation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: showTrackListAnimationValue < 0.5
+      padding: showTrackListAnimationValue < 0.7
           ? EdgeInsets.only(bottom: 0)
           : EdgeInsets.only(bottom: showTrackListAnimationValue * 32.0),
       child: Card(
@@ -383,7 +416,7 @@ class BodySectionAnimation extends StatelessWidget {
                 ),
                 AnimatedContainer(
                   duration: Duration(milliseconds: 600),
-                  height: showTrackListAnimationValue < 0.2 ? 90 : 140,
+                  height: showTrackListAnimationValue < 0.5 ? 90 : 140,
                   child: showTrackListAnimationValue < 0.5
                       ? Opacity(
                           opacity: (1 - showTrackListAnimationValue),
@@ -444,7 +477,7 @@ class BodySectionAnimation extends StatelessWidget {
                 showTrackListAnimationValue < 0.5
                     ? Opacity(
                         opacity: heroAnimationValue -
-                            showTrackListAnimationValue * 1.5,
+                            showTrackListAnimationValue ,
                         child: Container(
                           width: double.infinity,
                           height: 40.0,
