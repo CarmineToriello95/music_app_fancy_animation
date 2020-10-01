@@ -49,6 +49,7 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       body: SafeArea(
         child: Column(
           children: <Widget>[

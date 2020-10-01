@@ -10,6 +10,7 @@ class CustomAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
+      color: Colors.transparent,
       child: Container(
         height: 56.0,
         margin: const EdgeInsets.symmetric(horizontal: 18.0),
@@ -40,8 +41,6 @@ class CustomAppBar extends StatelessWidget {
     );
   }
 }
-
-
 
 class CustomBackIconAppBar extends StatelessWidget {
   @override
@@ -75,4 +74,3 @@ class CustomBackIconAppBar extends StatelessWidget {
     );
   }
 }
-
