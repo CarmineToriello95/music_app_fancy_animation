@@ -1,5 +1,6 @@
 class Album {
   final int id;
+  final String year;
   final String author;
   final String title;
   final String coverPath;
@@ -12,6 +13,7 @@ class Album {
   const Album(
       {this.id,
       this.author,
+      this.year,
       this.title,
       this.coverPath,
       this.genres,

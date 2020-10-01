@@ -103,7 +103,7 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
                           animation: heroAnimation,
                           builder: (_, __) {
                             return ImageSectionAnimation(
-                              album: widget.album,
+                              imagePath: widget.album.coverPath,
                               heroAnimationValue: heroAnimation.value,
                               pageController: _pageController,
                             );
@@ -126,7 +126,7 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
                               animation: _trackListAnimationController,
                               builder: (_, __) {
                                 return ImageSectionAnimation(
-                                  album: widget.album,
+                                  imagePath: widget.album.images[_currentIndex],
                                   showTrackListAnimationValue:
                                       _trackListAnimationController.value,
                                   pageController: _pageController,
@@ -217,7 +217,7 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
 }
 
 class ImageSectionAnimation extends StatelessWidget {
-  final Album album;
+  final String imagePath;
   final double heroAnimationValue;
   final double showTrackListAnimationValue;
   final PageController pageController;
@@ -225,7 +225,7 @@ class ImageSectionAnimation extends StatelessWidget {
   const ImageSectionAnimation({
     this.heroAnimationValue = 1,
     this.showTrackListAnimationValue = 0,
-    @required this.album,
+    @required this.imagePath,
     @required this.pageController,
   });
 
@@ -257,7 +257,7 @@ class ImageSectionAnimation extends StatelessWidget {
                   bottomRight: Radius.circular(heroAnimationValue * 10.0),
                 ),
                 child: Image.asset(
-                  album.coverPath,
+                  imagePath,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -385,11 +385,25 @@ class BodySectionAnimation extends StatelessWidget {
                 SizedBox(
                   height: 8.0,
                 ),
-                Text(
-                  '${album.title}',
-                  style: TextStyle(
-                    fontSize: 22.0,
-                    fontWeight: FontWeight.bold,
+                RichText(
+                  text: TextSpan(
+                    text: album.title,
+                    style: TextStyle(
+                      fontSize: 22.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    children: [
+                      TextSpan(text: ' '),
+                      TextSpan(
+                        text: album.year,
+                        style: TextStyle(
+                          fontSize: 22.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[400],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(
@@ -440,38 +454,46 @@ class BodySectionAnimation extends StatelessWidget {
                               .value *
                           50,
                   child: showTrackListAnimationValue < 0.5
-                      ? Opacity(
-                          opacity: heroAnimationValue -
-                              Tween<double>(begin: 0, end: 1)
-                                  .animate(
-                                    CurvedAnimation(
-                                      curve: Interval(0.0, 0.4),
-                                      parent: trackListAnimationController,
-                                    ),
-                                  )
-                                  .value,
-                          child: Column(
-                            children: <Widget>[
-                              Text(
+                      ? Column(
+                          children: <Widget>[
+                            Opacity(
+                              opacity: 1 -
+                                  Tween<double>(begin: 0, end: 1)
+                                      .animate(
+                                        CurvedAnimation(
+                                          curve: Interval(0.0, 0.5),
+                                          parent: trackListAnimationController,
+                                        ),
+                                      )
+                                      .value,
+                              child: Text(
                                 '${album.mainDescription}',
                                 style: TextStyle(
                                   fontSize: 13,
                                 ),
                               ),
-                              SizedBox(
-                                height: 8.0,
-                              ),
-                              Opacity(
-                                opacity: heroAnimationValue,
-                                child: Text(
-                                  '${album.moreDescription}',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                  ),
+                            ),
+                            SizedBox(
+                              height: 8.0,
+                            ),
+                            Opacity(
+                              opacity: heroAnimationValue -
+                                  Tween<double>(begin: 0, end: 1)
+                                      .animate(
+                                        CurvedAnimation(
+                                          curve: Interval(0.0, 0.5),
+                                          parent: trackListAnimationController,
+                                        ),
+                                      )
+                                      .value,
+                              child: Text(
+                                '${album.moreDescription}',
+                                style: TextStyle(
+                                  fontSize: 13,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         )
                       : Opacity(
                           opacity: Tween<double>(begin: 0, end: 1)
@@ -527,10 +549,14 @@ class BodySectionAnimation extends StatelessWidget {
                           width: double.infinity,
                           height: 40.0,
                           child: RaisedButton(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
                             color: Colors.black,
                             child: Text(
                               '\$26,66 Buy now',
-                              style: TextStyle(color: Colors.white60),
+                              style: TextStyle(
+                                  color: Colors.white.withOpacity(0.9)),
                             ),
                             onPressed: () {},
                           ),

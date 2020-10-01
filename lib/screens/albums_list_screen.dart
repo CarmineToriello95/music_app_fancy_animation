@@ -190,8 +190,6 @@ class _AlbumsListScreenState extends State<AlbumsListScreen>
     );
   }
 
-  
-
   void _onDragStart(DragStartDetails details) {
     _isDragFromLeft = _swipeAnimationController.isDismissed &&
         details.globalPosition.dx < MediaQuery.of(context).size.width / 2;
@@ -310,11 +308,25 @@ class AlbumCardBodySection extends StatelessWidget {
                   SizedBox(
                     height: 8.0,
                   ),
-                  Text(
-                    album.id.toString(),
-                    style: TextStyle(
-                      fontSize: 22.0,
-                      fontWeight: FontWeight.bold,
+                  RichText(
+                    text: TextSpan(
+                      text: album.title,
+                      style: TextStyle(
+                        fontSize: 22.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                      children: [
+                        TextSpan(text: ' '),
+                        TextSpan(
+                          text: album.year,
+                          style: TextStyle(
+                            fontSize: 22.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(
