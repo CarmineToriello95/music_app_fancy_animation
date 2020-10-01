@@ -96,9 +96,14 @@ class _AlbumsListScreenState extends State<AlbumsListScreen>
               onHorizontalDragStart: _onDragStart,
               onHorizontalDragUpdate: _onDragUpdate,
               onHorizontalDragEnd: _onDragEnd,
-              onTap: () => Navigator.of(context).push(
-                _createRoute(_bloc.stackAlbumList[0]),
-              ),
+              onVerticalDragUpdate: (details) {
+                if (details.primaryDelta > 0) {
+                  Navigator.of(context).push(
+                    _createRoute(_bloc.stackAlbumList[0]),
+                  );
+                }
+              },
+              onTap: () {},
               child: Padding(
                 padding: const EdgeInsets.only(top: 48.0, bottom: 8.0),
                 child: Column(

@@ -86,14 +86,78 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
               ),
             ),
             Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  _triggerTrackListAnimation();
-                },
-                child: Column(
-                  children: <Widget>[
-                    Hero(
-                      tag: heroTagImageSection,
+              child: Column(
+                children: <Widget>[
+                  Hero(
+                    tag: heroTagImageSection,
+                    flightShuttleBuilder: (
+                      BuildContext flightContext,
+                      Animation<double> heroAnimation,
+                      HeroFlightDirection flightDirection,
+                      BuildContext fromHeroContext,
+                      BuildContext toHeroContext,
+                    ) {
+                      return AnimatedBuilder(
+                        animation: heroAnimation,
+                        builder: (_, __) {
+                          return ImageSectionAnimation(
+                            imagePath: widget.album.images[_currentIndex],
+                            heroAnimationValue: heroAnimation.value,
+                            pageController: _pageController,
+                          );
+                        },
+                      );
+                    },
+                    child: !_animatingToTrackListScreen
+                        ? ImagesCarousel(
+                            album: widget.album,
+                            currentIndex: _currentIndex,
+                            onPageChanged: (index) {
+                              setState(
+                                () {
+                                  _currentIndex = index;
+                                },
+                              );
+                            },
+                          )
+                        : AnimatedBuilder(
+                            animation: _trackListAnimationController,
+                            builder: (_, __) {
+                              return ImageSectionAnimation(
+                                imagePath: widget.album.images[_currentIndex],
+                                showTrackListAnimationValue:
+                                    _trackListAnimationController.value,
+                                pageController: _pageController,
+                              );
+                            },
+                          ),
+                  ),
+                  !_animatingToTrackListScreen
+                      ? Column(
+                          children: <Widget>[
+                            SizedBox(
+                              height: 12.0,
+                            ),
+                            CarouselDots(
+                              dotsNumber: widget.album.images.length,
+                              activeIndex: _currentIndex,
+                            ),
+                            SizedBox(
+                              height: 12.0,
+                            ),
+                          ],
+                        )
+                      : AnimatedBuilder(
+                          animation: _trackListAnimationController,
+                          builder: (_, child) => Container(
+                            height:
+                                (1 - _trackListAnimationController.value) * 30,
+                          ),
+                        ),
+                  Expanded(
+                    flex: 2,
+                    child: Hero(
+                      tag: heroTagBodySection,
                       flightShuttleBuilder: (
                         BuildContext flightContext,
                         Animation<double> heroAnimation,
@@ -104,100 +168,32 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
                         return AnimatedBuilder(
                           animation: heroAnimation,
                           builder: (_, __) {
-                            return ImageSectionAnimation(
-                              imagePath: widget.album.images[_currentIndex],
-                              heroAnimationValue: heroAnimation.value,
-                              pageController: _pageController,
-                            );
-                          },
-                        );
-                      },
-                      child: !_animatingToTrackListScreen
-                          ? ImagesCarousel(
-                              album: widget.album,
-                              currentIndex: _currentIndex,
-                              onPageChanged: (index) {
-                                setState(
-                                  () {
-                                    _currentIndex = index;
-                                  },
-                                );
-                              },
-                            )
-                          : AnimatedBuilder(
-                              animation: _trackListAnimationController,
-                              builder: (_, __) {
-                                return ImageSectionAnimation(
-                                  imagePath: widget.album.images[_currentIndex],
-                                  showTrackListAnimationValue:
-                                      _trackListAnimationController.value,
-                                  pageController: _pageController,
-                                );
-                              },
-                            ),
-                    ),
-                    !_animatingToTrackListScreen
-                        ? Column(
-                            children: <Widget>[
-                              SizedBox(
-                                height: 12.0,
-                              ),
-                              CarouselDots(
-                                dotsNumber: widget.album.images.length,
-                                activeIndex: _currentIndex,
-                              ),
-                              SizedBox(
-                                height: 12.0,
-                              ),
-                            ],
-                          )
-                        : AnimatedBuilder(
-                            animation: _trackListAnimationController,
-                            builder: (_, child) => Container(
-                              height:
-                                  (1 - _trackListAnimationController.value) *
-                                      30,
-                            ),
-                          ),
-                    Expanded(
-                      flex: 2,
-                      child: Hero(
-                        tag: heroTagBodySection,
-                        flightShuttleBuilder: (
-                          BuildContext flightContext,
-                          Animation<double> heroAnimation,
-                          HeroFlightDirection flightDirection,
-                          BuildContext fromHeroContext,
-                          BuildContext toHeroContext,
-                        ) {
-                          return AnimatedBuilder(
-                            animation: heroAnimation,
-                            builder: (_, __) {
-                              return BodySectionAnimation(
-                                trackListAnimationController:
-                                    _trackListAnimationController,
-                                album: widget.album,
-                                heroAnimationValue: heroAnimation.value,
-                              );
-                            },
-                          );
-                        },
-                        child: AnimatedBuilder(
-                          animation: _trackListAnimationController,
-                          builder: (_, __) {
                             return BodySectionAnimation(
                               trackListAnimationController:
                                   _trackListAnimationController,
                               album: widget.album,
-                              showTrackListAnimationValue:
-                                  _trackListAnimationController.value,
+                              onVerticalDrag: _triggerTrackListAnimation,
+                              heroAnimationValue: heroAnimation.value,
                             );
                           },
-                        ),
+                        );
+                      },
+                      child: AnimatedBuilder(
+                        animation: _trackListAnimationController,
+                        builder: (_, __) {
+                          return BodySectionAnimation(
+                            trackListAnimationController:
+                                _trackListAnimationController,
+                            album: widget.album,
+                            onVerticalDrag: _triggerTrackListAnimation,
+                            showTrackListAnimationValue:
+                                _trackListAnimationController.value,
+                          );
+                        },
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -347,12 +343,14 @@ class BodySectionAnimation extends StatelessWidget {
   final double heroAnimationValue;
   final double showTrackListAnimationValue;
   final Animation<double> trackListAnimationController;
+  final Function onVerticalDrag;
   final Album album;
 
   const BodySectionAnimation({
     this.heroAnimationValue = 1,
     this.showTrackListAnimationValue = 0,
     @required this.trackListAnimationController,
+    @required this.onVerticalDrag,
     @required this.album,
   });
 
@@ -442,86 +440,94 @@ class BodySectionAnimation extends StatelessWidget {
                 SizedBox(
                   height: 16.0,
                 ),
-                AnimatedContainer(
-                  duration: Duration(milliseconds: 200),
-                  height: 90 +
-                      Tween<double>(begin: 0, end: 1)
-                              .animate(
-                                CurvedAnimation(
-                                  curve: Interval(0.0, 0.5),
-                                  reverseCurve: Interval(0.5, 1.0),
-                                  parent: trackListAnimationController,
-                                ),
-                              )
-                              .value *
-                          50,
-                  child: showTrackListAnimationValue < 0.5
-                      ? Column(
-                          children: <Widget>[
-                            Opacity(
-                              opacity: 1 -
-                                  Tween<double>(begin: 0, end: 1)
-                                      .animate(
-                                        CurvedAnimation(
-                                          curve: Interval(0.0, 0.5),
-                                          parent: trackListAnimationController,
-                                        ),
-                                      )
-                                      .value,
-                              child: Text(
-                                '${album.mainDescription}',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 8.0,
-                            ),
-                            Opacity(
-                              opacity: heroAnimationValue -
-                                  Tween<double>(begin: 0, end: 1)
-                                      .animate(
-                                        CurvedAnimation(
-                                          curve: Interval(0.0, 0.5),
-                                          parent: trackListAnimationController,
-                                        ),
-                                      )
-                                      .value,
-                              child: Text(
-                                '${album.moreDescription}',
-                                style: TextStyle(
-                                  fontSize: 13,
+                GestureDetector(
+                  onVerticalDragUpdate: (details) {
+                    onVerticalDrag();
+                  },
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 200),
+                    height: 90 +
+                        Tween<double>(begin: 0, end: 1)
+                                .animate(
+                                  CurvedAnimation(
+                                    curve: Interval(0.0, 0.5),
+                                    reverseCurve: Interval(0.5, 1.0),
+                                    parent: trackListAnimationController,
+                                  ),
+                                )
+                                .value *
+                            50,
+                    child: showTrackListAnimationValue < 0.5
+                        ? Column(
+                            children: <Widget>[
+                              Opacity(
+                                opacity: 1 -
+                                    Tween<double>(begin: 0, end: 1)
+                                        .animate(
+                                          CurvedAnimation(
+                                            curve: Interval(0.0, 0.5),
+                                            parent:
+                                                trackListAnimationController,
+                                          ),
+                                        )
+                                        .value,
+                                child: Text(
+                                  '${album.mainDescription}',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        )
-                      : Opacity(
-                          opacity: Tween<double>(begin: 0, end: 1)
-                              .animate(
-                                CurvedAnimation(
-                                  curve: Interval(0.6, 1.0),
-                                  parent: trackListAnimationController,
+                              SizedBox(
+                                height: 8.0,
+                              ),
+                              Opacity(
+                                opacity: heroAnimationValue -
+                                    Tween<double>(begin: 0, end: 1)
+                                        .animate(
+                                          CurvedAnimation(
+                                            curve: Interval(0.0, 0.5),
+                                            parent:
+                                                trackListAnimationController,
+                                          ),
+                                        )
+                                        .value,
+                                child: Text(
+                                  '${album.moreDescription}',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                  ),
                                 ),
-                              )
-                              .value,
-                          child: ListView.builder(
-                            itemCount: album.trackList.length,
-                            shrinkWrap: true,
-                            itemBuilder: (_, index) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Text(album.trackList[index].name),
-                                  Text(album.trackList[index].duration),
-                                ],
+                              ),
+                            ],
+                          )
+                        : Opacity(
+                            opacity: Tween<double>(begin: 0, end: 1)
+                                .animate(
+                                  CurvedAnimation(
+                                    curve: Interval(0.6, 1.0),
+                                    parent: trackListAnimationController,
+                                  ),
+                                )
+                                .value,
+                            child: ListView.builder(
+                              itemCount: album.trackList.length,
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemBuilder: (_, index) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text(album.trackList[index].name),
+                                    Text(album.trackList[index].duration),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                  ),
                 ),
                 SizedBox(
                   height: 24.0,
