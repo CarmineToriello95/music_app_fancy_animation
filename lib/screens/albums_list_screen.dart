@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music_app_fancy_animation/bloc/bloc.dart';
+import 'package:music_app_fancy_animation/screens/album_details_screen.dart';
 import 'package:music_app_fancy_animation/shared_widgets.dart/carousel_dots.dart';
 
 import '../constants.dart';
@@ -72,8 +73,9 @@ class _AlbumsListScreenState extends State<AlbumsListScreen>
         onHorizontalDragStart: _onDragStart,
         onHorizontalDragUpdate: _onDragUpdate,
         onHorizontalDragEnd: _onDragEnd,
-        // onTap: () => Navigator.of(context).push(_createRoute()),
-        onTap: () {},
+        onTap: () => Navigator.of(context).push(
+          _createRoute(_bloc.stackAlbumList[0]),
+        ),
         child: Padding(
           padding: const EdgeInsets.only(top: 48.0, bottom: 8.0),
           child: Column(
@@ -144,15 +146,15 @@ class _AlbumsListScreenState extends State<AlbumsListScreen>
     );
   }
 
-  // Route _createRoute() {
-  //   return PageRouteBuilder(
-  //     pageBuilder: (context, animation, secondaryAnimation) => AlbumDetails(
-  //       album: hardCodedAlbums[0],
-  //       animation: animation,
-  //     ),
-  //     transitionDuration: const Duration(milliseconds: 1000),
-  //   );
-  // }
+  Route _createRoute(Album album) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          AlbumDetailsScreen(
+        album: album,
+      ),
+      transitionDuration: const Duration(milliseconds: 1000),
+    );
+  }
 
   bool _isDraggable;
   bool _isDragFromLeft = false;
