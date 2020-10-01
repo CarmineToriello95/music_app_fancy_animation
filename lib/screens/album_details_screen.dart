@@ -29,7 +29,13 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
     _trackListAnimationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 600),
-    );
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.dismissed) {
+          setState(() {
+            _animatingToTrackListScreen = !_animatingToTrackListScreen;
+          });
+        }
+      });
     _animatingToTrackListScreen = false;
   }
 
@@ -80,9 +86,6 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
             Expanded(
               child: GestureDetector(
                 onTap: () {
-                  setState(() {
-                    _animatingToTrackListScreen = true;
-                  });
                   _triggerTrackListAnimation();
                 },
                 child: Column(
@@ -169,6 +172,8 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
                             animation: heroAnimation,
                             builder: (_, __) {
                               return BodySectionAnimation(
+                                tracklistcontroller:
+                                    _trackListAnimationController,
                                 album: widget.album,
                                 heroAnimationValue: heroAnimation.value,
                               );
@@ -179,6 +184,8 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
                           animation: _trackListAnimationController,
                           builder: (_, __) {
                             return BodySectionAnimation(
+                              tracklistcontroller:
+                                  _trackListAnimationController,
                               album: widget.album,
                               showTrackListAnimationValue:
                                   _trackListAnimationController.value,
@@ -199,6 +206,9 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
 
   _triggerTrackListAnimation() {
     if (_trackListAnimationController.isDismissed) {
+      setState(() {
+        _animatingToTrackListScreen = true;
+      });
       _trackListAnimationController.forward();
     } else if (_trackListAnimationController.isCompleted) {
       _trackListAnimationController.reverse();
@@ -334,11 +344,13 @@ class _ImagesCarouselState extends State<ImagesCarousel> {
 class BodySectionAnimation extends StatelessWidget {
   final double heroAnimationValue;
   final double showTrackListAnimationValue;
+  final Animation<double> tracklistcontroller;
   final Album album;
 
   const BodySectionAnimation({
     this.heroAnimationValue = 1,
     this.showTrackListAnimationValue = 0,
+    @required this.tracklistcontroller,
     @required this.album,
   });
 
@@ -415,11 +427,29 @@ class BodySectionAnimation extends StatelessWidget {
                   height: 16.0,
                 ),
                 AnimatedContainer(
-                  duration: Duration(milliseconds: 600),
-                  height: showTrackListAnimationValue < 0.5 ? 90 : 140,
+                  duration: Duration(milliseconds: 200),
+                  height: 90 +
+                      Tween<double>(begin: 0, end: 1)
+                              .animate(
+                                CurvedAnimation(
+                                  curve: Interval(0.0, 0.5),
+                                  reverseCurve: Interval(0.5, 1.0),
+                                  parent: tracklistcontroller,
+                                ),
+                              )
+                              .value *
+                          50,
                   child: showTrackListAnimationValue < 0.5
                       ? Opacity(
-                          opacity: (1 - showTrackListAnimationValue),
+                          opacity: heroAnimationValue -
+                              Tween<double>(begin: 0, end: 1)
+                                  .animate(
+                                    CurvedAnimation(
+                                      curve: Interval(0.0, 0.4),
+                                      parent: tracklistcontroller,
+                                    ),
+                                  )
+                                  .value,
                           child: Column(
                             children: <Widget>[
                               Text(
@@ -444,7 +474,14 @@ class BodySectionAnimation extends StatelessWidget {
                           ),
                         )
                       : Opacity(
-                          opacity: showTrackListAnimationValue,
+                          opacity: Tween<double>(begin: 0, end: 1)
+                              .animate(
+                                CurvedAnimation(
+                                  curve: Interval(0.6, 1.0),
+                                  parent: tracklistcontroller,
+                                ),
+                              )
+                              .value,
                           child: ListView.builder(
                             itemCount: album.trackList.length,
                             shrinkWrap: true,
@@ -477,7 +514,14 @@ class BodySectionAnimation extends StatelessWidget {
                 showTrackListAnimationValue < 0.5
                     ? Opacity(
                         opacity: heroAnimationValue -
-                            showTrackListAnimationValue ,
+                            Tween<double>(begin: 0, end: 1)
+                                .animate(
+                                  CurvedAnimation(
+                                    curve: Interval(0.0, 0.1),
+                                    parent: tracklistcontroller,
+                                  ),
+                                )
+                                .value,
                         child: Container(
                           width: double.infinity,
                           height: 40.0,
