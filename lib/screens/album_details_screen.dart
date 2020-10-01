@@ -172,7 +172,7 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
                             animation: heroAnimation,
                             builder: (_, __) {
                               return BodySectionAnimation(
-                                tracklistcontroller:
+                                trackListAnimationController:
                                     _trackListAnimationController,
                                 album: widget.album,
                                 heroAnimationValue: heroAnimation.value,
@@ -184,7 +184,7 @@ class _AlbumDetailsScreenState extends State<AlbumDetailsScreen>
                           animation: _trackListAnimationController,
                           builder: (_, __) {
                             return BodySectionAnimation(
-                              tracklistcontroller:
+                              trackListAnimationController:
                                   _trackListAnimationController,
                               album: widget.album,
                               showTrackListAnimationValue:
@@ -344,13 +344,13 @@ class _ImagesCarouselState extends State<ImagesCarousel> {
 class BodySectionAnimation extends StatelessWidget {
   final double heroAnimationValue;
   final double showTrackListAnimationValue;
-  final Animation<double> tracklistcontroller;
+  final Animation<double> trackListAnimationController;
   final Album album;
 
   const BodySectionAnimation({
     this.heroAnimationValue = 1,
     this.showTrackListAnimationValue = 0,
-    @required this.tracklistcontroller,
+    @required this.trackListAnimationController,
     @required this.album,
   });
 
@@ -434,7 +434,7 @@ class BodySectionAnimation extends StatelessWidget {
                                 CurvedAnimation(
                                   curve: Interval(0.0, 0.5),
                                   reverseCurve: Interval(0.5, 1.0),
-                                  parent: tracklistcontroller,
+                                  parent: trackListAnimationController,
                                 ),
                               )
                               .value *
@@ -446,7 +446,7 @@ class BodySectionAnimation extends StatelessWidget {
                                   .animate(
                                     CurvedAnimation(
                                       curve: Interval(0.0, 0.4),
-                                      parent: tracklistcontroller,
+                                      parent: trackListAnimationController,
                                     ),
                                   )
                                   .value,
@@ -478,7 +478,7 @@ class BodySectionAnimation extends StatelessWidget {
                               .animate(
                                 CurvedAnimation(
                                   curve: Interval(0.6, 1.0),
-                                  parent: tracklistcontroller,
+                                  parent: trackListAnimationController,
                                 ),
                               )
                               .value,
@@ -506,6 +506,7 @@ class BodySectionAnimation extends StatelessWidget {
                   opacity: heroAnimationValue,
                   child: PlayButtons(
                     showTrackListAnimationValue: showTrackListAnimationValue,
+                    trackListAnimationController: trackListAnimationController,
                   ),
                 ),
                 SizedBox(
@@ -518,7 +519,7 @@ class BodySectionAnimation extends StatelessWidget {
                                 .animate(
                                   CurvedAnimation(
                                     curve: Interval(0.0, 0.1),
-                                    parent: tracklistcontroller,
+                                    parent: trackListAnimationController,
                                   ),
                                 )
                                 .value,
@@ -549,7 +550,10 @@ class BodySectionAnimation extends StatelessWidget {
 
 class PlayButtons extends StatelessWidget {
   final double showTrackListAnimationValue;
-  PlayButtons({this.showTrackListAnimationValue = 0});
+  final Animation<double> trackListAnimationController;
+  PlayButtons(
+      {this.showTrackListAnimationValue = 0,
+      @required this.trackListAnimationController});
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -562,14 +566,28 @@ class PlayButtons extends StatelessWidget {
           ),
           child: showTrackListAnimationValue < 0.5
               ? Opacity(
-                  opacity: 1 - showTrackListAnimationValue,
+                  opacity: Tween<double>(begin: 1, end: 0)
+                      .animate(
+                        CurvedAnimation(
+                          curve: Interval(0.0, 0.5),
+                          parent: trackListAnimationController,
+                        ),
+                      )
+                      .value,
                   child: IconButton(
                     icon: Icon(Icons.favorite_border),
                     onPressed: () {},
                   ),
                 )
               : Opacity(
-                  opacity: showTrackListAnimationValue,
+                  opacity: Tween<double>(begin: 0, end: 1)
+                      .animate(
+                        CurvedAnimation(
+                          curve: Interval(0.5, 1),
+                          parent: trackListAnimationController,
+                        ),
+                      )
+                      .value,
                   child: IconButton(
                     icon: Icon(Icons.skip_previous),
                     onPressed: () {},
@@ -620,14 +638,28 @@ class PlayButtons extends StatelessWidget {
           ),
           child: showTrackListAnimationValue < 0.5
               ? Opacity(
-                  opacity: 1 - showTrackListAnimationValue,
+                  opacity: Tween<double>(begin: 1, end: 0)
+                      .animate(
+                        CurvedAnimation(
+                          curve: Interval(0.0, 0.5),
+                          parent: trackListAnimationController,
+                        ),
+                      )
+                      .value,
                   child: IconButton(
                     icon: Icon(Icons.share),
                     onPressed: () {},
                   ),
                 )
               : Opacity(
-                  opacity: showTrackListAnimationValue,
+                  opacity: Tween<double>(begin: 0, end: 1)
+                      .animate(
+                        CurvedAnimation(
+                          curve: Interval(0.5, 1),
+                          parent: trackListAnimationController,
+                        ),
+                      )
+                      .value,
                   child: IconButton(
                     icon: Icon(Icons.skip_next),
                     onPressed: () {},
